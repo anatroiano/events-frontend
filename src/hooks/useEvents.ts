@@ -1,40 +1,39 @@
-import {keepPreviousData, useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
-import {createEvent, getEventById, getEvents, getUpcomingEvents, registerParticipant} from '../api/events'
-import type {CreateEventPayload, RegisterPayload} from '../types/event'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-export const useEvents = (page: number) =>
-    useQuery({
-        queryKey: ['events', 'all', page],
-        queryFn: () => getEvents(page),
-        placeholderData: keepPreviousData,
-    })
+import { createEvent, getEventById, getEvents, getUpcomingEvents, registerParticipant } from '../api/events'
+import { queryKeys } from '../lib/queryKeys'
+import type { CreateEventPayload, RegisterPayload } from '../types/event'
 
-export const useUpcomingEvents = (page: number) =>
-    useQuery({
-        queryKey: ['events', 'upcoming', page],
-        queryFn: () => getUpcomingEvents(page),
-        placeholderData: keepPreviousData,
-    })
-
-export const useEvent = (id: string) =>
-    useQuery({
-        queryKey: ['events', id],
-        queryFn: () => getEventById(id),
-        enabled: !!id,
-    })
-
-export const useRegister = (eventId: string) => {
-    const queryClient = useQueryClient()
-    return useMutation({
-        mutationFn: (payload: RegisterPayload) => registerParticipant(eventId, payload),
-        onSuccess: () => queryClient.invalidateQueries({queryKey: ['events']}),
-    })
+export function useEvents(page: number, filter: 'all' | 'upcoming' = 'all') {
+  return useQuery({
+    queryKey: queryKeys.events.list(filter, page),
+    queryFn: () => filter === 'upcoming' ? getUpcomingEvents(page) : getEvents(page),
+    placeholderData: keepPreviousData,
+  })
 }
 
-export const useCreateEvent = () => {
-    const queryClient = useQueryClient()
-    return useMutation({
-        mutationFn: (payload: CreateEventPayload) => createEvent(payload),
-        onSuccess: () => queryClient.invalidateQueries({queryKey: ['events']}),
-    })
+export function useEvent(id: string) {
+  return useQuery({
+    queryKey: queryKeys.events.detail(id),
+    queryFn: () => getEventById(id),
+    enabled: !!id,
+  })
+}
+
+export function useRegister(eventId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (payload: RegisterPayload) => registerParticipant(eventId, payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.events.all }),
+  })
+}
+
+export function useCreateEvent() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (payload: CreateEventPayload) => createEvent(payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.events.all }),
+  })
 }

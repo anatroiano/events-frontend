@@ -1,21 +1,26 @@
+import {createApiError} from './client'
+
 export type DownloadResult = 'ready' | 'pending'
 
 export async function downloadCertificate(id: string): Promise<DownloadResult> {
-    const res = await fetch(`/api-cert/certificates/${encodeURIComponent(id)}/download`)
+  const response = await fetch(`/api-cert/certificates/${encodeURIComponent(id)}/download`)
 
-    if (res.status === 202) return 'pending'
-    if (!res.ok) throw new Error('Erro ao baixar o certificado')
+  if (response.status === 202) return 'pending'
+  if (!response.ok) throw await createApiError(response)
 
-    const blob = await res.blob()
-    const url = URL.createObjectURL(blob)
+  const blob = await response.blob()
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
 
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `certificado-${id}.pdf`
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
+  try {
+    link.href = url
+    link.download = `certificado-${id}.pdf`
+    document.body.appendChild(link)
+    link.click()
+  } finally {
+    link.remove()
     URL.revokeObjectURL(url)
+  }
 
-    return 'ready'
+  return 'ready'
 }

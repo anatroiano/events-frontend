@@ -1,5 +1,5 @@
-export interface CheckinInfo {
-    eventTitle: string
-    startsAt: string
-    checkedIn: boolean
+export interface CheckInInfo {
+  eventTitle: string
+  startsAt: string
+  checkedIn: boolean
 }

@@ -1,113 +1,133 @@
+import {zodResolver} from '@hookform/resolvers/zod'
+import {CheckCircle2, TicketCheck, X} from 'lucide-react'
 import {useEffect, useRef} from 'react'
 import {useForm} from 'react-hook-form'
-import {zodResolver} from '@hookform/resolvers/zod'
-import {z} from 'zod'
-import {useRegister} from '../hooks/useEvents'
+
 import {ApiError} from '../api/client'
+import {useRegister} from '../hooks/useEvents'
+import {type RegistrationFormData, registrationSchema} from '../schemas/registration'
+import {Alert} from './ui/Alert'
+import {Button} from './ui/Button'
+import {Input} from './ui/Input'
 
-const schema = z.object({
-    participantName: z.string().min(2, 'Informe seu nome'),
-    participantEmail: z.string().email('E-mail inválido'),
-})
-type FormData = z.infer<typeof schema>
+function resolveError(error: unknown) {
+  if (error instanceof ApiError && error.message.trim()) return error.message
 
-function errorMessage(error: unknown) {
-    if (error instanceof ApiError) {
-        if (error.status === 404) return 'Evento não encontrado.'
-        if (error.status === 409)
-            return 'Você já está inscrito neste evento ou as vagas esgotaram.'
-    }
-    return 'Não foi possível concluir a inscrição. Tente novamente.'
+  return 'Não foi possível concluir a inscrição. Tente novamente.'
 }
 
-interface Props {
-    eventId: string
-    eventTitle: string
-    onClose: () => void
+interface RegisterModalProps {
+  eventId: string
+  eventTitle: string
+  onClose: () => void
 }
 
-export default function RegisterModal({eventId, eventTitle, onClose}: Props) {
-    const dialogRef = useRef<HTMLDialogElement>(null)
-    const {mutate, isPending, isSuccess, error} = useRegister(eventId)
-    const {
-        register,
-        handleSubmit,
-        formState: {errors},
-    } = useForm<FormData>({resolver: zodResolver(schema)})
+export default function RegisterModal({eventId, eventTitle, onClose}: RegisterModalProps) {
+  const dialogRef = useRef<HTMLDialogElement>(null)
+  const {mutate, isPending, isSuccess, error} = useRegister(eventId)
+  const {
+    register,
+    handleSubmit,
+    formState: {errors},
+  } = useForm<RegistrationFormData>({resolver: zodResolver(registrationSchema)})
 
-    useEffect(() => {
-        const dialog = dialogRef.current
-        if (dialog && !dialog.open) dialog.showModal()
-    }, [])
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (dialog && !dialog.open) dialog.showModal()
+  }, [])
 
-    return (
-        <dialog
-            ref={dialogRef}
-            onClose={onClose} // dispara também ao apertar Esc
-            className="m-auto w-full max-w-md rounded-lg p-6 backdrop:bg-black/50"
+  return (
+    <dialog
+      ref={dialogRef}
+      onClose={onClose}
+      aria-labelledby="register-title"
+      className="m-auto w-[calc(100%-2rem)] max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl border border-border bg-surface p-0 shadow-2xl shadow-black/60 backdrop:bg-black/70 backdrop:backdrop-blur-sm open:animate-slide-up"
+    >
+      <div className="flex items-center justify-between border-b border-border px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div
+            className="flex size-8 items-center justify-center rounded-lg bg-purple-600/20 border border-purple-600/30">
+            <TicketCheck className="size-4 text-purple-400"/>
+          </div>
+          <h2 id="register-title" className="text-base font-semibold text-text-primary">
+            {isSuccess ? 'Inscrição confirmada' : 'Inscrever-se'}
+          </h2>
+        </div>
+        <button
+          type="button"
+          aria-label="Fechar inscrição"
+          onClick={() => dialogRef.current?.close()}
+          className="flex size-8 items-center justify-center rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-3 transition-all cursor-pointer"
         >
-            {isSuccess ? (
-                <div>
-                    <h2 className="mb-2 text-xl font-bold">Inscrição confirmada! 🎉</h2>
-                    <p className="mb-4 text-gray-600">
-                        Enviamos um e-mail de confirmação para você.
-                    </p>
-                    <button
-                        onClick={() => dialogRef.current?.close()}
-                        className="rounded bg-blue-600 px-4 py-2 text-white"
-                    >
-                        Fechar
-                    </button>
-                </div>
-            ) : (
-                <form onSubmit={handleSubmit((data) => mutate(data))} className="grid gap-4">
-                    <h2 className="text-xl font-bold">Inscrição: {eventTitle}</h2>
+          <X className="size-4"/>
+        </button>
+      </div>
 
-                    <div>
-                        <label htmlFor="name" className="mb-1 block text-sm">Nome</label>
-                        <input
-                            id="name"
-                            className="w-full rounded border p-2"
-                            {...register('participantName')}
-                        />
-                        {errors.participantName && (
-                            <p className="mt-1 text-sm text-red-600">{errors.participantName.message}</p>
-                        )}
-                    </div>
+      <div className="px-6 py-6">
+        {isSuccess ? (
+          <div className="flex flex-col items-center text-center gap-5 py-4 animate-slide-up">
+            <div
+              className="size-16 rounded-full bg-emerald-900/30 border border-emerald-700/40 flex items-center justify-center">
+              <CheckCircle2 className="size-8 text-emerald-400"/>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-text-primary">Inscrição confirmada! 🎉</p>
+              <p className="mt-1.5 text-sm text-text-secondary">
+                Enviamos um e-mail de confirmação para você.
+              </p>
+            </div>
+            <Button
+              onClick={() => dialogRef.current?.close()}
+              variant="secondary"
+              className="mt-2"
+            >
+              Fechar
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit((data) => mutate(data))} className="grid gap-5">
+            <p className="text-sm text-text-secondary leading-relaxed">
+              Preencha seus dados para se inscrever em{' '}
+              <strong className="text-text-primary font-medium">{eventTitle}</strong>.
+            </p>
 
-                    <div>
-                        <label htmlFor="email" className="mb-1 block text-sm">E-mail</label>
-                        <input
-                            id="email"
-                            type="email"
-                            className="w-full rounded border p-2"
-                            {...register('participantEmail')}
-                        />
-                        {errors.participantEmail && (
-                            <p className="mt-1 text-sm text-red-600">{errors.participantEmail.message}</p>
-                        )}
-                    </div>
+            <Input
+              id="modal-name"
+              label="Nome completo"
+              autoComplete="name"
+              placeholder="Seu nome"
+              error={errors.participantName?.message}
+              {...register('participantName')}
+            />
+            <Input
+              id="modal-email"
+              label="E-mail"
+              type="email"
+              autoComplete="email"
+              placeholder="seu@email.com"
+              error={errors.participantEmail?.message}
+              {...register('participantEmail')}
+            />
 
-                    {error && <p className="text-sm text-red-600">{errorMessage(error)}</p>}
-
-                    <div className="flex justify-end gap-2">
-                        <button
-                            type="button"
-                            onClick={() => dialogRef.current?.close()}
-                            className="rounded bg-gray-100 px-4 py-2"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={isPending}
-                            className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
-                        >
-                            {isPending ? 'Enviando...' : 'Confirmar inscrição'}
-                        </button>
-                    </div>
-                </form>
+            {error && (
+              <Alert variant="error">{resolveError(error)}</Alert>
             )}
-        </dialog>
-    )
+
+            <div className="flex items-center gap-3 pt-1">
+              <Button type="submit" loading={isPending} className="flex-1">
+                {isPending ? 'Enviando...' : 'Confirmar inscrição'}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => dialogRef.current?.close()}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        )}
+      </div>
+    </dialog>
+  )
 }

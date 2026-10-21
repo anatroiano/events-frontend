@@ -1,1 +1,253 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@import 'react-day-picker/style.css' layer(components);
+
+@theme {
+  --color-bg: #0d0b14;
+  --color-surface: #13101f;
+  --color-surface-2: #1a1529;
+  --color-surface-3: #221c36;
+  --color-border: #2e2550;
+  --color-border-light: #3d3268;
+
+  --color-purple-50: #f5f0ff;
+  --color-purple-100: #ede0ff;
+  --color-purple-200: #d4b8ff;
+  --color-purple-300: #b388ff;
+  --color-purple-400: #9c5fff;
+  --color-purple-500: #8b3dff;
+  --color-purple-600: #7c20f5;
+  --color-purple-700: #6a12d9;
+  --color-purple-800: #560fb0;
+  --color-purple-900: #430d8a;
+
+  --color-violet-glow: #a855f7;
+
+  --color-text-primary: #f0ecff;
+  --color-text-secondary: #a89dc8;
+  --color-text-muted: #6b5f8a;
+  --color-text-placeholder: #8b7da7;
+
+  --color-success: #22c55e;
+  --color-success-bg: #0f2d1a;
+  --color-warning: #f59e0b;
+  --color-warning-bg: #2a1f00;
+  --color-error: #f87171;
+  --color-error-bg: #2d0f0f;
+}
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100vh;
+    background: radial-gradient(ellipse 75% 35% at 50% 0%, #8b3dff12, transparent), var(--color-bg);
+  }
+
+  button, input, textarea {
+    font: inherit;
+  }
+
+  button, a, input, textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input, textarea {
+    min-width: 0;
+  }
+
+  h1, h2, p {
+    overflow-wrap: anywhere;
+  }
+
+  ::selection {
+    background: #8b3dff59;
+    color: var(--color-text-primary);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-purple-400);
+    outline-offset: 4px;
+  }
+}
+
+@layer components {
+  .event-calendar {
+    --rdp-accent-color: var(--color-purple-400);
+    --rdp-accent-background-color: var(--color-surface-3);
+    --rdp-day-height: 2.5rem;
+    --rdp-day-width: 2.25rem;
+    --rdp-day_button-height: 2.25rem;
+    --rdp-day_button-width: 2.125rem;
+    --rdp-day_button-border-radius: 0.75rem;
+    --rdp-selected-border: 0;
+    --rdp-today-color: var(--color-purple-300);
+    --rdp-outside-opacity: 0.35;
+    --rdp-disabled-opacity: 0.2;
+    font-size: 0.875rem;
+  }
+
+  .event-calendar .rdp-month_caption {
+    font-size: 0.875rem;
+    text-transform: capitalize;
+  }
+
+  .event-calendar .rdp-weekday {
+    color: var(--color-text-secondary);
+    font-size: 0.6875rem;
+    font-weight: 500;
+  }
+
+  .event-calendar .rdp-day_button {
+    transition: background-color 150ms, color 150ms;
+  }
+
+  .event-calendar .rdp-day_button:hover:not(:disabled) {
+    background-color: var(--color-surface-3);
+  }
+
+  .event-calendar .rdp-selected .rdp-day_button {
+    background-color: var(--color-purple-600);
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .event-calendar .rdp-selected .rdp-day_button:hover {
+    background-color: var(--color-purple-500);
+  }
+
+  .event-calendar .rdp-button_previous,
+  .event-calendar .rdp-button_next {
+    border-radius: 0.5rem;
+    color: var(--color-text-secondary);
+  }
+
+  .event-calendar .rdp-button_previous:hover:not(:disabled),
+  .event-calendar .rdp-button_next:hover:not(:disabled) {
+    background-color: var(--color-surface-3);
+    color: var(--color-text-primary);
+  }
+
+  .page-shell {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: clamp(1.5rem, 5vw, 3.5rem) clamp(1rem, 4vw, 2rem) 5rem;
+  }
+
+  .page-heading {
+    font-size: clamp(1.875rem, 4.5vw, 3rem);
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+
+  .eyebrow {
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-purple-300);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    transition: color 150ms;
+  }
+
+  .back-link:hover {
+    color: var(--color-purple-200);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(139, 61, 255, 0);
+  }
+  50% {
+    box-shadow: 0 0 20px 4px rgba(139, 61, 255, 0.3);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease both;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.45s ease both;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+.animate-spin {
+  animation: spin 0.8s linear infinite;
+}
+
+.stagger-1 {
+  animation-delay: 0.05s;
+}
+
+.stagger-2 {
+  animation-delay: 0.10s;
+}
+
+.stagger-3 {
+  animation-delay: 0.15s;
+}
+
+.stagger-4 {
+  animation-delay: 0.20s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

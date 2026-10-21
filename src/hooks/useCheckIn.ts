@@ -1,19 +1,22 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
-import {checkIn, getCheckinInfo} from '../api/checkin'
 
-export const useCheckinInfo = (token: string) =>
-    useQuery({
-        queryKey: ['checkin', token],
-        queryFn: () => getCheckinInfo(token),
-        enabled: !!token,
-        retry: false,
-    })
+import {checkIn, getCheckInInfo} from '../api/checkin'
+import {queryKeys} from '../lib/queryKeys'
 
-export const useCheckIn = (token: string) => {
-    const queryClient = useQueryClient()
-    return useMutation({
-        mutationFn: () => checkIn(token),
-        onSuccess: () =>
-            queryClient.invalidateQueries({queryKey: ['checkin', token]}),
-    })
+export function useCheckInInfo(token: string) {
+  return useQuery({
+    queryKey: queryKeys.checkIn(token),
+    queryFn: () => getCheckInInfo(token),
+    enabled: !!token,
+    retry: false,
+  })
+}
+
+export function useCheckIn(token: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => checkIn(token),
+    onSuccess: () => queryClient.invalidateQueries({queryKey: queryKeys.checkIn(token)}),
+  })
 }

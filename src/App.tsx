@@ -1,18 +1,24 @@
 import {Route, Routes} from 'react-router-dom'
+
+import Navbar from './components/Navbar'
+import {routes} from './lib/routes'
+import Certificate from './pages/Certificate'
+import CheckIn from './pages/CheckIn'
+import CreateEvent from './pages/CreateEvent'
+import EventDetail from './pages/EventDetail'
 import EventsList from './pages/EventsList'
-import EventDetail from "./pages/EventDetail.tsx";
-import CheckIn from "./pages/Checkin.tsx";
-import CreateEvent from "./pages/CreateEvent.tsx";
-import Certificate from "./pages/Certificate.tsx";
 
 export default function App() {
-    return (
-        <Routes>
-            <Route path="/" element={<EventsList/>}/>
-            <Route path="/events/:id" element={<EventDetail/>}/>
-            <Route path="/new" element={<CreateEvent/>}/>
-            <Route path="/checkin/:token" element={<CheckIn/>}/>
-            <Route path="/certificates/:id" element={<Certificate/>}/>
-        </Routes>
-    )
+  return (
+    <div className="min-h-screen">
+      <Navbar/>
+      <Routes>
+        <Route path={routes.events} element={<EventsList/>}/>
+        <Route path={routes.eventDetail} element={<EventDetail/>}/>
+        <Route path={routes.createEvent} element={<CreateEvent/>}/>
+        <Route path={routes.checkIn} element={<CheckIn/>}/>
+        <Route path={routes.certificate} element={<Certificate/>}/>
+      </Routes>
+    </div>
+  )
 }
