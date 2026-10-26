@@ -5,4 +5,5 @@ export const queryKeys = {
     detail: (id: string) => ['events', 'detail', id] as const,
   },
   checkIn: (token: string) => ['checkin', token] as const,
+  certificate: (id: string) => ['certificates', id] as const,
 }

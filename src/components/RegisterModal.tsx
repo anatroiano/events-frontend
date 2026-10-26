@@ -3,18 +3,12 @@ import {CheckCircle2, TicketCheck, X} from 'lucide-react'
 import {useEffect, useRef} from 'react'
 import {useForm} from 'react-hook-form'
 
-import {ApiError} from '../api/client'
 import {useRegister} from '../hooks/useEvents'
+import {getApiErrorMessage} from '../lib/apiErrors'
 import {type RegistrationFormData, registrationSchema} from '../schemas/registration'
 import {Alert} from './ui/Alert'
 import {Button} from './ui/Button'
 import {Input} from './ui/Input'
-
-function resolveError(error: unknown) {
-  if (error instanceof ApiError && error.message.trim()) return error.message
-
-  return 'Não foi possível concluir a inscrição. Tente novamente.'
-}
 
 interface RegisterModalProps {
   eventId: string
@@ -110,7 +104,9 @@ export default function RegisterModal({eventId, eventTitle, onClose}: RegisterMo
             />
 
             {error && (
-              <Alert variant="error">{resolveError(error)}</Alert>
+              <Alert variant="error">
+                {getApiErrorMessage(error, 'Não foi possível concluir a inscrição. Tente novamente.')}
+              </Alert>
             )}
 
             <div className="flex items-center gap-3 pt-1">

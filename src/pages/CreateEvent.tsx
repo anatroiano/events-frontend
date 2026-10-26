@@ -11,6 +11,7 @@ import {DateTimePicker} from '../components/ui/DateTimePicker'
 import {Input} from '../components/ui/Input'
 import {Textarea} from '../components/ui/Textarea'
 import {useCreateEvent} from '../hooks/useEvents'
+import {getApiErrorMessage} from '../lib/apiErrors'
 import {eventPath, routes} from '../lib/routes'
 import {type CreateEventFormInput, type CreateEventFormOutput, createEventSchema} from '../schemas/event'
 
@@ -61,6 +62,7 @@ export default function CreateEvent() {
               <Input
                 id="title"
                 label="Título do evento"
+                maxLength={255}
                 placeholder="Ex: Workshop de React Avançado"
                 error={errors.title?.message}
                 {...register('title')}
@@ -68,6 +70,7 @@ export default function CreateEvent() {
               <Textarea
                 id="description"
                 label="Descrição"
+                maxLength={2000}
                 rows={5}
                 placeholder="Conte sobre o evento e o que os participantes vão aprender..."
                 error={errors.description?.message}
@@ -96,7 +99,11 @@ export default function CreateEvent() {
                   {...register('maxParticipants')}
                 />
               </div>
-              {error && <Alert variant="error">Não foi possível criar o evento. Tente novamente.</Alert>}
+              {error && (
+                <Alert variant="error">
+                  {getApiErrorMessage(error, 'Não foi possível criar o evento. Tente novamente.')}
+                </Alert>
+              )}
               <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:justify-end">
                 <ButtonLink to={routes.events} variant="secondary" size="lg">
                   Cancelar

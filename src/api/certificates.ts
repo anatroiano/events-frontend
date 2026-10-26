@@ -1,4 +1,8 @@
-import {createApiError} from './client'
+import type {CertificateInfo} from '../types/certificate'
+import {createApiError, request} from './client'
+
+export const getCertificate = (id: string) =>
+  request<CertificateInfo>(`/certificates/${encodeURIComponent(id)}`, {baseUrl: '/api-cert'})
 
 export type DownloadResult = 'ready' | 'pending'
 

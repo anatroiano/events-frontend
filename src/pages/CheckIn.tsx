@@ -1,19 +1,19 @@
 import {CalendarDays, CheckCircle2, Clock, ExternalLink} from 'lucide-react'
 import {Link, useParams} from 'react-router-dom'
 
-import {ApiError} from '../api/client'
 import {Alert} from '../components/ui/Alert'
 import {Button} from '../components/ui/Button'
 import {ButtonLink} from '../components/ui/ButtonLink'
 import {Card, CardBody} from '../components/ui/Card'
 import {LoadingScreen} from '../components/ui/Spinner'
 import {useCheckIn, useCheckInInfo} from '../hooks/useCheckIn'
+import {getApiErrorMessage} from '../lib/apiErrors'
 import {formatDateTime} from '../lib/dates'
 import {routes} from '../lib/routes'
 
 export default function CheckIn() {
   const {token = ''} = useParams()
-  const {data: info, isLoading, isError} = useCheckInInfo(token)
+  const {data: info, isLoading, isError, error: infoError} = useCheckInInfo(token)
   const {mutate, isPending, isSuccess, error} = useCheckIn(token)
 
   if (isLoading) return <LoadingScreen message="Verificando link de check-in..."/>
@@ -23,17 +23,12 @@ export default function CheckIn() {
         <div className="size-16 rounded-2xl bg-red-900/20 border border-red-800/40 flex items-center justify-center">
           <span className="text-2xl">⚠️</span>
         </div>
-        <Alert variant="error" title="Link inválido">
-          Link de check-in inválido ou expirado.
+        <Alert variant="error" title="Não foi possível carregar o check-in">
+          {getApiErrorMessage(infoError, 'Não foi possível carregar o check-in. Tente novamente.')}
         </Alert>
         <Link to={routes.events} className="text-sm text-purple-300 hover:text-purple-200">Voltar para eventos</Link>
       </main>
     )
-
-  const errorMessage =
-    error instanceof ApiError && error.status === 404
-      ? 'Link de check-in inválido ou expirado.'
-      : 'Não foi possível confirmar o check-in. Tente novamente.'
 
   const formatted = formatDateTime(info.startsAt, 'full')
 
@@ -91,7 +86,7 @@ export default function CheckIn() {
               </Button>
               {error && (
                 <Alert variant="error" className="w-full text-left">
-                  {errorMessage}
+                  {getApiErrorMessage(error, 'Não foi possível confirmar o check-in. Tente novamente.')}
                 </Alert>
               )}
             </div>
