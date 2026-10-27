@@ -1,0 +1,23 @@
+services:
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0 --port 5173 --strictPort"
+    ports:
+      - '${FRONTEND_HOST:-127.0.0.1}:${FRONTEND_PORT:-5173}:5173'
+    environment:
+      EVENTS_API_URL: ${EVENTS_API_URL}
+      CERTIFICATES_API_URL: ${CERTIFICATES_API_URL}
+    volumes:
+      - .:/app
+      - frontend-node-modules:/app/node_modules
+    networks:
+      - event-network
+
+volumes:
+  frontend-node-modules:
+
+networks:
+  event-network:
+    external: true
+    name: ${BACKEND_NETWORK:-event-network}

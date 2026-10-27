@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-ssr
+.git
+.idea
+.vscode
+.agents
+.codex
+.aws
+.env
+.env.*
+*.local
+*.log
+*.tsbuildinfo
+AGENTS.md

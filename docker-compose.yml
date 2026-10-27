@@ -1,0 +1,19 @@
+services:
+  frontend:
+    image: events-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '${FRONTEND_HOST:-127.0.0.1}:${FRONTEND_PORT:-5173}:80'
+    environment:
+      EVENTS_API_URL: ${EVENTS_API_URL}
+      CERTIFICATES_API_URL: ${CERTIFICATES_API_URL}
+      NGINX_ENVSUBST_FILTER: '^(EVENTS_API_URL|CERTIFICATES_API_URL)$$'
+    networks:
+      - event-network
+
+networks:
+  event-network:
+    external: true
+    name: ${BACKEND_NETWORK:-event-network}
